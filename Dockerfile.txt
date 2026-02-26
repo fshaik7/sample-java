@@ -1,0 +1,12 @@
+# Use a slim Java runtime image as the base
+FROM openjdk:21-jdk-slim
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the packaged JAR file from the Maven build (generated in the Jenkins workspace)
+# Assumes the JAR file is in target/my-app-*.jar after the 'Build and Test with Maven' stage
+COPY target/*.jar app.jar
+
+# Command to run the application when the container starts
+CMD ["java", "-jar", "app.jar"]

@@ -1,0 +1,35 @@
+pipeline {
+    agent any // The entire pipeline will run on any available agent
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git 'https://github.com/fshaik7/sample-java.git' // Replace with your repository URL
+            }
+        }
+
+        stage('Build and Test with Maven') {
+            agent {
+                docker {
+                    image 'maven:3.9.9-eclipse-temurin-21' // Use a specific Maven Docker image
+                    args '-v $HOME/.m2:/root/.m2' // Mount Maven cache to speed up subsequent builds
+                }
+            }
+            steps {
+                sh 'mvn clean install -B' // Run Maven clean install within the container
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    // Build a Docker image for the application using the Dockerfile in the repo root
+                    def appImage = docker.build("my-java-app:latest") 
+                    // Optional: use "appImage.push()" to push to a registry if configured
+                }
+            }
+        }
+        
+        // Optional: Add a deployment stage here (e.g., to Kubernetes)
+    }
+}
